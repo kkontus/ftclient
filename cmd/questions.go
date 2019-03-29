@@ -15,14 +15,13 @@
 package cmd
 
 import (
-	"fmt"
-	"github.com/spf13/cobra"
-	"ftserver/proto"
 	"context"
-	"bufio"
-	"os"
-	"strings"
+	"fmt"
+	cutil "ftclient/util"
+	"ftserver/proto"
 	"github.com/olekukonko/tablewriter"
+	"github.com/spf13/cobra"
+	"os"
 )
 
 // questionsCmd represents the questions command
@@ -39,37 +38,16 @@ func init() {
 	rootCmd.AddCommand(questionsCmd)
 }
 
-const (
-	NETWORK = "network"
-	FILE = "file"
-	DB = "db"
-)
-
-type condition func(string) bool
-
-func promptForInput(f condition, text string) string {
-	input := ""
-
-	buf := bufio.NewReader(os.Stdin)
-	fmt.Print("> ")
-	sentence, err := buf.ReadBytes('\n')
-	if err != nil {
-		fmt.Println(err)
-		return promptForInput(f, text)
-	} else if (f != nil && f(string(sentence))) {
-		fmt.Println(text)
-		return promptForInput(f, text)
-	}
-
-	input = string(sentence)
-	input = strings.TrimSpace(input)
-	return input
-}
+//const (
+//	NETWORK = "network"
+//	FILE = "file"
+//	DB = "db"
+//)
 
 func promptForPlayerName() string {
 	fmt.Println("Enter player name: ")
 	conditionFunc := func(text string) bool { return len(text) <= 2 }
-	player := promptForInput(conditionFunc, "User must have at least 2 characters")
+	player := cutil.PromptForInput(conditionFunc, "User must have at least 2 characters")
 
 	return player
 }
@@ -125,7 +103,7 @@ func startQuiz() {
 				fmt.Printf("%d: %s\n", i, elem)
 			}
 
-			input := promptForInput(nil, "")
+			input := cutil.PromptForInput(nil, "")
 			userResponses = append(userResponses, input)
 			fmt.Println(input)
 		}
