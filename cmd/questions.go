@@ -40,9 +40,9 @@ func init() {
 }
 
 const (
-	NETWORK = iota
-	FILE
-	DB
+	NETWORK = "network"
+	FILE = "file"
+	DB = "db"
 )
 
 type condition func(string) bool
@@ -109,7 +109,7 @@ func startQuiz() {
 	fmt.Println("########################################\n")
 
 	client := proto.NewQuestionsServiceClient(conn)
-	req := &proto.LoadQuestionsList{Network: NETWORK}
+	req := &proto.LoadQuestionsList{}
 
 	player := promptForPlayerName()
 	fmt.Println("\nWelcome " + player)
