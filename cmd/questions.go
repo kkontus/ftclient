@@ -22,6 +22,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 	"os"
+	"strings"
 )
 
 // questionsCmd represents the questions command
@@ -96,24 +97,27 @@ func startQuiz() {
 	var userResponses []string
 	if response, err := client.GetAllQuestions(context.Background(), req); err == nil {
 		for i, elem := range response.Result {
-			fmt.Printf("\n%d: %s\n", i, elem.Question)
+			fmt.Printf("\n%d: %s\n", i, strings.TrimSpace(elem.Question))
 			fmt.Println("___________________________________\n")
 
 			for i, elem := range elem.Answers {
-				fmt.Printf("%d: %s\n", i, elem)
+				fmt.Printf("%d: %s\n", i, strings.TrimSpace(elem))
 			}
 
 			input := cutil.PromptForInput(nil, "")
 			userResponses = append(userResponses, input)
 			fmt.Println(input)
 		}
-	}
 
-	reqUserResult := &proto.SendUserAnswers{Answers: userResponses, User: player}
-	if responseUserResult, err := client.CheckUserAnswers(context.Background(), reqUserResult); err == nil {
-		data := prepareData(userResponses, responseUserResult.Result, responseUserResult.Answers)
-		drawTable(data, responseUserResult.Percentage)
+		reqUserResult := &proto.SendUserAnswers{Answers: userResponses, User: player}
+		if responseUserResult, err := client.CheckUserAnswers(context.Background(), reqUserResult); err == nil {
+			data := prepareData(userResponses, responseUserResult.Result, responseUserResult.Answers)
+			drawTable(data, responseUserResult.Percentage)
+		} else {
+			fmt.Println("Unable to retrieve user results")
+		}
+
 	} else {
-		fmt.Println("Unable to retrieve user results")
+		fmt.Println("Unable to retrieve questions")
 	}
 }
